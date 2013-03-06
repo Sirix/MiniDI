@@ -8,10 +8,11 @@ namespace MiniDI
     internal class InjectedType<TRealisation> : BaseInjectedType
     {
         private bool _isBeingBuilt;
-        public MiniDIContainer Container { get; set; }
 
         private TRealisation DefaultValue { get; set; }
         private TRealisation InstantiatedObject { get; set; }
+
+        internal ConstructorInfo SelectedConstructor { get; set; }
 
         public InjectedType()
         {
@@ -98,7 +99,7 @@ namespace MiniDI
                                            typeof (TRealisation).FullName);
 
             _isBeingBuilt = true;
-            TRealisation value = TypeFactory<TRealisation>.Build();
+            TRealisation value = TypeFactory<TRealisation>.Build(this);
             _isBeingBuilt = false;
             return value;
         }

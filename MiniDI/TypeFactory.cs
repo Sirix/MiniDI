@@ -8,15 +8,18 @@ namespace MiniDI
 {
     class TypeFactory<TRequested>
     {
-        private readonly MethodInfo _method;
-        public TypeFactory()
+        private readonly MethodInfo _createInstanceRecursive;
+        private InjectedType<TRequested> _injectedType;
+
+        private TypeFactory(InjectedType<TRequested> injectedType)
         {
-            _method = GetType().GetMethod("CreateInstanceRecursive", BindingFlags.NonPublic | BindingFlags.Instance);
+            _injectedType = injectedType;
+            _createInstanceRecursive = GetType().GetMethod("CreateInstanceRecursive", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-        public static TRequested Build()
+        public static TRequested Build(InjectedType<TRequested> injectedType)
         {
-            var factory = new TypeFactory<TRequested>();
+            var factory = new TypeFactory<TRequested>(injectedType);
 
             return factory.CreateInstanceRecursive<TRequested>();
         }
@@ -38,27 +41,40 @@ namespace MiniDI
             {
                 throw new ResolveException("Unable to find a realisation of type {0}", builtType.FullName);
             }
-            ConstructorInfo ci = null;
-            var constructors = builtType.GetConstructors();
-            if (constructors.Length == 1)
-                ci = constructors[0];
-            else
-                foreach (var constructorInfo in constructors)
-                {
-                    if (constructorInfo.GetCustomAttributes(typeof (InjectedAttribute), false).Length == 1)
-                        ci = constructorInfo;
-                }
 
-            if (ci == null)
-                throw new ResolveException(
-                    "Unable to determine a required constructor in type {0}. Consider using [Injected] attribute on constructor being used by MiniDI",
-                    builtType.FullName);
+            var ci = GetConstructor(builtType);
 
             var constructedObject = TryInvoke<TCurrent>(ci);
             if (!constructedObject.Equals(defaultValue))
                 return constructedObject;
 
             throw new ResolveException("Unable to resolve type " + builtType.FullName);
+        }
+
+        private ConstructorInfo GetConstructor(Type builtType)
+        {
+            ConstructorInfo ci = null;
+            if (_injectedType.SelectedConstructor != null)
+                ci = _injectedType.SelectedConstructor;
+            else
+            {
+                var constructors = builtType.GetConstructors();
+                if (constructors.Length == 1)
+                    ci = constructors[0];
+                else
+                    foreach (var constructorInfo in constructors)
+                        if (constructorInfo.GetCustomAttributes(typeof (InjectedAttribute), false).Length == 1)
+                        {
+                            ci = constructorInfo;
+                            break;
+                        }
+                _injectedType.SelectedConstructor = ci;
+            }
+            if (ci == null)
+                throw new ResolveException(
+                    "Unable to determine a required constructor in type {0}. Consider using [Injected] attribute on constructor being used by MiniDI",
+                    builtType.FullName);
+            return ci;
         }
 
         private TCurrent TryInvoke<TCurrent>(ConstructorInfo constructorInfo)
@@ -75,7 +91,7 @@ namespace MiniDI
 
                 try
                 {
-                    MethodInfo genericMethod = _method.MakeGenericMethod(new[] { p.ParameterType });
+                    MethodInfo genericMethod = _createInstanceRecursive.MakeGenericMethod(new[] { p.ParameterType });
                     object result = genericMethod.Invoke(this, null);
                     values[index] = result;
                 }
