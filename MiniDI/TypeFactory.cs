@@ -8,7 +8,6 @@ namespace MiniDI
 {
     class TypeFactory<TRequested>
     {
-        private bool _recursiveMetDuringBuild;
         private readonly MethodInfo _method;
         public TypeFactory()
         {
@@ -34,14 +33,7 @@ namespace MiniDI
                 if (result && !value.Equals(defaultValue))
                     return value;
             }
-            else
-            {
-                if (_recursiveMetDuringBuild)
-                    throw
-                        new ResolveException("A recursive dependency find during resolving of {0}", builtType.FullName);
-                else
-                    _recursiveMetDuringBuild = true;
-            }
+
             if (builtType.IsAbstract || builtType.IsInterface)
             {
                 throw new ResolveException("Unable to find a realisation of type {0}", builtType.FullName);

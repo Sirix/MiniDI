@@ -7,6 +7,7 @@ namespace MiniDI
 {
     internal class InjectedType<TRealisation> : BaseInjectedType
     {
+        private bool _isBeingBuilt;
         public MiniDIContainer Container { get; set; }
 
         private TRealisation DefaultValue { get; set; }
@@ -92,7 +93,14 @@ namespace MiniDI
 
         private TRealisation CreateInstance()
         {
-            return TypeFactory<TRealisation>.Build();
+            if (_isBeingBuilt)
+                throw new ResolveException("A recursive dependency find during resolving of {0}",
+                                           typeof (TRealisation).FullName);
+
+            _isBeingBuilt = true;
+            TRealisation value = TypeFactory<TRealisation>.Build();
+            _isBeingBuilt = false;
+            return value;
         }
     }
 
