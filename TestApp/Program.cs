@@ -85,7 +85,7 @@ namespace TestApp
 
         public void Do()
         {
-         //   Console.WriteLine("Do! + {0}", i);
+            Console.WriteLine("Do! + {0}", i);
             _sender.Send();
             _reader.Read();
         }
