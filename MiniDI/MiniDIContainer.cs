@@ -57,5 +57,10 @@ namespace MiniDI
 
             return true;
         }
+
+        public static void RemoveAll()
+        {
+            Types.Clear();
+        }
     }
 }

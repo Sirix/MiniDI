@@ -1,51 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MiniDI;
 
-namespace TestApp
+namespace MiniDI.Tests.SampleCode
 {
-    public class Program
-    {
-        private static void Main(string[] args)
-        {
-            MiniDIContainer.Set<IMailSender, MailSender>();
-            MiniDIContainer.Set<IService, Service>();
-            MiniDIContainer.Set<IDataReader, SqlReader>();
-            MiniDIContainer.Set<IStorage, Storage>();
-
-            CheckTime(() =>
-                          {
-                             // for (int i = 0; i < 1000; i++)
-                              try
-                              {
-                                  var service = MiniDIContainer.Get<IService>();
-                                  service.Do();
-                              }
-                              catch(ResolveException e)
-                              {
-                                  Console.WriteLine(e);
-                              }
-                          });
-
-            Console.Read();
-        }
-        static void CheckTime(Action a)
-        {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            a();
-
-            sw.Stop();
-            Console.WriteLine(sw.Elapsed);
-        }
-    }
-
     internal interface IMailSender
     {
         void Send();
@@ -77,11 +35,6 @@ namespace TestApp
             i++;
             //    f = s;
         }
-
-        //public SomeWorker()
-        //{
-        //    i++;
-        //}
 
         public void Do()
         {
