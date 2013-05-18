@@ -11,17 +11,17 @@ namespace MiniDI
         private readonly MethodInfo _createInstanceRecursive;
         private InjectedType<TRequested> _injectedType;
 
-        private TypeFactory(InjectedType<TRequested> injectedType)
-        {
-            _injectedType = injectedType;
-            _createInstanceRecursive = GetType().GetMethod("CreateInstanceRecursive", BindingFlags.NonPublic | BindingFlags.Instance);
-        }
-
         public static TRequested Build(InjectedType<TRequested> injectedType)
         {
             var factory = new TypeFactory<TRequested>(injectedType);
 
             return factory.CreateInstanceRecursive<TRequested>();
+        }
+
+        private TypeFactory(InjectedType<TRequested> injectedType)
+        {
+            _injectedType = injectedType;
+            _createInstanceRecursive = GetType().GetMethod("CreateInstanceRecursive", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         private TCurrent CreateInstanceRecursive<TCurrent>()
@@ -53,23 +53,20 @@ namespace MiniDI
 
         private ConstructorInfo GetConstructor(Type builtType)
         {
-            ConstructorInfo ci = null;
-            if (_injectedType.SelectedConstructor != null)
-                ci = _injectedType.SelectedConstructor;
+            ConstructorInfo ci = _injectedType.SelectedConstructor;
+
+            var constructors = builtType.GetConstructors();
+            if (constructors.Length == 1)
+                ci = constructors[0];
             else
-            {
-                var constructors = builtType.GetConstructors();
-                if (constructors.Length == 1)
-                    ci = constructors[0];
-                else
-                    foreach (var constructorInfo in constructors)
-                        if (constructorInfo.GetCustomAttributes(typeof (InjectedAttribute), false).Length == 1)
-                        {
-                            ci = constructorInfo;
-                            break;
-                        }
-                _injectedType.SelectedConstructor = ci;
-            }
+                foreach (var constructorInfo in constructors)
+                    if (constructorInfo.GetCustomAttributes(typeof (InjectedAttribute), false).Length == 1)
+                    {
+                        ci = constructorInfo;
+                        break;
+                    }
+            _injectedType.SelectedConstructor = ci;
+
             if (ci == null)
                 throw new ResolveException(
                     "Unable to determine a required constructor in type {0}. Consider using [Injected] attribute on constructor being used by MiniDI",
