@@ -41,6 +41,10 @@ namespace MiniDI
             {
                 throw new ResolveException("Unable to find a realisation of type {0}", builtType.FullName);
             }
+            if (builtType.IsValueType)
+            {
+                return Activator.CreateInstance<TCurrent>();
+            }
 
             var ci = GetConstructor(builtType);
 
@@ -60,7 +64,7 @@ namespace MiniDI
                 ci = constructors[0];
             else
                 foreach (var constructorInfo in constructors)
-                    if (constructorInfo.GetCustomAttributes(typeof (InjectedAttribute), false).Length == 1)
+                    if (constructorInfo.IsDefined(typeof (InjectedAttribute), false))
                     {
                         ci = constructorInfo;
                         break;

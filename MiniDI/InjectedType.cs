@@ -64,7 +64,7 @@ namespace MiniDI
 
         private TRealisation GetObject()
         {
-            if (!(InstantiatedObject.Equals(DefaultValue)))
+            if (!Object.ReferenceEquals(InstantiatedObject, DefaultValue))
                 InstantiatedObject = CreateInstance();
 
             return InstantiatedObject;

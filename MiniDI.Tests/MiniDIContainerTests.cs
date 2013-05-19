@@ -13,7 +13,7 @@ namespace MiniDI.Tests
         }
 
         [Test]
-        public void Container_Creates_Instance_Of_Registered_Type()
+        public void Container_Creates_Instance_Of_Registered_Reference_Type()
         {
             MiniDIContainer.Set<IMailSender, MailSender>();
 
@@ -22,6 +22,17 @@ namespace MiniDI.Tests
             Assert.That(mailSender, Is.Not.Null);
             Assert.That(mailSender, Is.InstanceOf<IMailSender>());
             Assert.That(mailSender, Is.InstanceOf<MailSender>());
+        }
+
+        [Test]
+        public void Container_Creates_Instance_Of_Registered_Value_Type()
+        {
+            MiniDIContainer.Set<IMailSender, StructWithInterface>();
+
+            var mailSender = MiniDIContainer.Get<IMailSender>();
+
+            Assert.That(mailSender, Is.InstanceOf<IMailSender>());
+            Assert.That(mailSender, Is.InstanceOf<StructWithInterface>());
         }
 
         [Test]
@@ -55,6 +66,29 @@ namespace MiniDI.Tests
             bool result = MiniDIContainer.TryGet(out mailSender);
 
             Assert.That(result, Is.False);
+        }
+        [Test]
+        public void Singleton_Reference_Object()
+        {
+            MiniDIContainer.Set<IMailSender, MailSender>(LifeTime.Singleton);
+
+
+            var ms1 = MiniDIContainer.Get<IMailSender>();
+            var ms2 = MiniDIContainer.Get<IMailSender>();
+
+            Assert.That(ms1, Is.SameAs(ms2));
+        }
+
+        [Test]
+        public void Singleton_ValueType_Object()
+        {
+            MiniDIContainer.Set<IMailSender, StructWithInterface>(LifeTime.Singleton);
+
+
+            var ms1 = MiniDIContainer.Get<IMailSender>();
+            var ms2 = MiniDIContainer.Get<IMailSender>();
+
+            Assert.That(ms1, Is.EqualTo(ms2));
         }
     }
 }

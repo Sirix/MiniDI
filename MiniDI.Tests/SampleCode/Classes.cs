@@ -21,6 +21,14 @@ namespace MiniDI.Tests.SampleCode
         void Do();
     }
 
+    internal struct StructWithInterface : IMailSender
+    {
+        public void Send()
+        {
+            Console.WriteLine("SEND");
+        }
+    }
+
     internal class Service : IService
     {
         private readonly IMailSender _sender;
