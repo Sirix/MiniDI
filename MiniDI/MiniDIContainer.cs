@@ -5,11 +5,11 @@ namespace MiniDI
 {
     public class MiniDIContainer
     {
-        private static readonly Dictionary<Type, BaseInjectedType> Types;
+        private static readonly Dictionary<Type, InjectedTypeBase> Types;
 
         static MiniDIContainer()
         {
-            Types = new Dictionary<Type, BaseInjectedType>();
+            Types = new Dictionary<Type, InjectedTypeBase>();
         }
 
         /// <summary>

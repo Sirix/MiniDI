@@ -46,7 +46,7 @@ namespace MiniDI.Tests
         }
 
         [Test]
-        public void Container_Doesnt_Throw_During_Create_Instance_Of_NonRegistered_Type()
+        public void Container_TryGet_Doesnt_Throw_During_Create_Instance_Of_NonRegistered_Type()
         {
             IMailSender mailSender;
             bool result = MiniDIContainer.TryGet(out mailSender);

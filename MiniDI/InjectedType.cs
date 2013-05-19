@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace MiniDI
 {
-    internal class InjectedType<TRealisation> : BaseInjectedType
+    internal class InjectedType<TRealisation> : InjectedTypeBase
     {
         private bool _isBeingBuilt;
 
@@ -35,7 +35,7 @@ namespace MiniDI
             return BuildInternal();
         }
 
-        internal static BaseInjectedType BuildAsBase()
+        internal static InjectedTypeBase BuildAsBase()
         {
             return BuildInternal();
         }
@@ -109,7 +109,7 @@ namespace MiniDI
         LifeTime LifeTime { get; set; }
     }
 
-    internal class BaseInjectedType : IInjectType
+    internal class InjectedTypeBase : IInjectType
     {
         public Type Type { get; set; }
         public LifeTime LifeTime { get; set; }
