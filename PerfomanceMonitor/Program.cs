@@ -14,7 +14,7 @@ namespace PerfomanceMonitor
         static void Main(string[] args)
         {
             Console.Read();
-
+            Console.WriteLine("Start");
             MiniDIContainer.Set<IMailSender, MailSender>();
 
             int limit = 10000;
@@ -48,6 +48,7 @@ namespace PerfomanceMonitor
             Console.WriteLine("{0,-30} {1}", "MiniDI", TimeSpan.FromMilliseconds(miniDi.TotalMilliseconds / cycles));
             Console.WriteLine("{0,-30} {1}", "Activator", TimeSpan.FromMilliseconds(activator.TotalMilliseconds / cycles));
 
+            Console.Read();
             Console.Read();
         }
     }

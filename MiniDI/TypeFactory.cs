@@ -18,10 +18,15 @@ namespace MiniDI
             return factory.CreateInstanceRecursive<TRequested>();
         }
 
-        private TypeFactory(InjectedType<TRequested> injectedType)
+        public TypeFactory(InjectedType<TRequested> injectedType)
         {
             _injectedType = injectedType;
             _createInstanceRecursive = GetType().GetMethod("CreateInstanceRecursive", BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        public TRequested Create()
+        {
+            return CreateInstanceRecursive<TRequested>();
         }
 
         private TCurrent CreateInstanceRecursive<TCurrent>()

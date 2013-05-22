@@ -12,10 +12,14 @@ namespace MiniDI
 
         internal ConstructorInfo SelectedConstructor { get; set; }
 
+        private TypeFactory<TRealisation> typeFactory;
+
         public InjectedType()
         {
             Type = typeof (TRealisation);
             DefaultValue = default(TRealisation);
+
+            typeFactory = new TypeFactory<TRealisation>(this);
         }
 
         private static InjectedType<TRealisation> BuildInternal()
@@ -97,7 +101,7 @@ namespace MiniDI
                                            typeof (TRealisation).FullName);
 
             _isBeingBuilt = true;
-            TRealisation value = TypeFactory<TRealisation>.Build(this);
+            TRealisation value = typeFactory.Create();
             _isBeingBuilt = false;
             return value;
         }
